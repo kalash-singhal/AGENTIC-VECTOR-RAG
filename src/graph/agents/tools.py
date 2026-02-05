@@ -1,6 +1,6 @@
 from typing import List
 from langchain_core.tools import tool
-from db.parent_store_manager import ParentStoreManager
+from vector_db.parent_store_manager import ParentStoreManager
 
 class ToolFactory:
     
