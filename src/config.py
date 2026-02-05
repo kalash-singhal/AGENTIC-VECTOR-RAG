@@ -1,4 +1,5 @@
 # --- Directory Configuration ---
+INPUT_DOCS_PATH = "input_docs"
 MARKDOWN_DIR = "markdown_docs"
 PARENT_STORE_PATH = "parent_store"
 QDRANT_DB_PATH = "qdrant_db"
