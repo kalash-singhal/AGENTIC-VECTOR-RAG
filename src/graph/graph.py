@@ -3,9 +3,9 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import ToolNode, tools_condition
 from functools import partial
 
-from .graph_state import State
-from agents.nodes import *
-from .edges import *
+from graph.graph_state import State
+from graph.agents.nodes import *
+from graph.edges import *
 
 def create_agent_graph(llm, tools_list):
     llm_with_tools = llm.bind_tools(tools_list)

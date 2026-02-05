@@ -1,7 +1,7 @@
 from langchain_core.messages import SystemMessage, HumanMessage, RemoveMessage, AIMessage
-from graph_state import State, AgentState
-from query_schema import QueryAnalysis
-from .prompts import *
+from graph.graph_state import State, AgentState
+from graph.agents.query_schema import QueryAnalysis
+from graph.agents.prompts import *
 
 def analyze_chat_and_summarize(state: State, llm):
     if len(state["messages"]) < 4:
