@@ -17,10 +17,19 @@ class DocumentChuncker:
         self.__min_parent_size = config.MIN_PARENT_SIZE
         self.__max_parent_size = config.MAX_PARENT_SIZE
 
-    def create_chunks(self, path_dir=config.MARKDOWN_DIR):
+    def create_chunks(self, path_dir: Path):
         all_parent_chunks, all_child_chunks = [], []
 
-        for doc_path_str in sorted(glob.glob(os.path.join(path_dir, "*.md"))):
+        if not path_dir.exists():
+            raise FileNotFoundError(f"Path does not exist: {path_dir}")
+        
+        if path_dir.is_file() and path_dir.suffix.lower() == ".md":
+            path_str =  sorted(path_dir.parent.glob("*.md"))
+        
+        if path_dir.is_dir():
+            path_str =  sorted(path_dir.glob("*.md"))
+
+        for doc_path_str in path_str:
             doc_path = Path(doc_path_str)
             parent_chunks, child_chunks = self.create_chunks_single(doc_path)
             all_parent_chunks.extend(parent_chunks)
@@ -38,9 +47,7 @@ class DocumentChuncker:
         split_parents = self.__split_large_parents(merged_parents)
         cleaned_parents = self.__clean_small_chunks(split_parents)
         
-        all_parent_chunks, all_child_chunks = [], []
-        self.__create_child_chunks(all_parent_chunks, all_child_chunks, cleaned_parents, doc_path)
-        return all_parent_chunks, all_child_chunks
+        return self.__create_child_chunks(cleaned_parents, doc_path)
 
     def __merge_small_parents(self, chunks):
         if not chunks:
@@ -118,10 +125,12 @@ class DocumentChuncker:
         
         return cleaned
 
-    def __create_child_chunks(self, all_parent_pairs, all_child_chunks, parent_chunks, doc_path):
+    def __create_child_chunks(self, parent_chunks, doc_path):
+        all_parent_pairs, all_child_chunks = [], []
         for i, p_chunk in enumerate(parent_chunks):
             parent_id = f"{doc_path.stem}_parent_{i}"
             p_chunk.metadata.update({"source": str(doc_path.stem)+".pdf", "parent_id": parent_id})
-            
             all_parent_pairs.append((parent_id, p_chunk))
             all_child_chunks.extend(self.__child_splitter.split_documents([p_chunk]))
+
+            return all_parent_pairs, all_child_chunks

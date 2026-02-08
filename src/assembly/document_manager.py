@@ -1,16 +1,19 @@
 from pathlib import Path
+import config
 import shutil
 import config
-from readers.pdf_reader import pdfs_to_markdowns
+from readers.pdf_reader import convert_pdf_to_markdown
 
 class DocumentManager:
 
-    def __init__(self, rag_system):
-        self.rag_system = rag_system
+    def __init__(self, chunker, parent_store, vector_db):
+        self.parent_store = parent_store
+        self.chunker = chunker
+        self.vector_db = vector_db
         self.markdown_dir = Path(config.MARKDOWN_DIR)
         self.markdown_dir.mkdir(parents=True, exist_ok=True)
         
-    def add_documents(self, document_paths, progress_callback=None):
+    def add_all_documents(self, document_paths, progress_callback=None):
         if not document_paths:
             return 0, 0
             
@@ -38,16 +41,16 @@ class DocumentManager:
                 if Path(doc_path).suffix.lower() == ".md":
                     shutil.copy(doc_path, md_path)
                 else:
-                    pdfs_to_markdowns(str(doc_path), overwrite=False)            
-                parent_chunks, child_chunks = self.rag_system.chunker.create_chunks_single(md_path)
+                    convert_pdf_to_markdown(str(doc_path), Path(config.MARKDOWN_DIR), overwrite=False, doc_complexity="complex")          
+                parent_chunks, child_chunks = self.chunker.create_chunks(md_path)
                 
                 if not child_chunks:
                     skipped += 1
                     continue
                 
-                collection = self.rag_system.vector_db.get_collection(self.rag_system.collection_name)
+                collection = self.vector_db.get_collection(config.CHILD_COLLECTION)
                 collection.add_documents(child_chunks)
-                self.rag_system.parent_store.save_many(parent_chunks)
+                self.parent_store.save_many(parent_chunks)
                 
                 added += 1
                 
@@ -67,6 +70,6 @@ class DocumentManager:
             shutil.rmtree(self.markdown_dir)
             self.markdown_dir.mkdir(parents=True, exist_ok=True)
         
-        self.rag_system.parent_store.clear_store()
-        self.rag_system.vector_db.delete_collection(self.rag_system.collection_name)
-        self.rag_system.vector_db.create_collection(self.rag_system.collection_name)
+        self.parent_store.clear_store()
+        self.vector_db.delete_collection(config.CHILD_COLLECTION)
+        self.vector_db.create_collection(config.CHILD_COLLECTION)

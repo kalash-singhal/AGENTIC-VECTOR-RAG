@@ -1,4 +1,5 @@
 import os
+import config
 import pymupdf
 import pymupdf4llm
 import glob
@@ -32,11 +33,11 @@ def pdf_to_markdown(pdf_path, output_dir):
     output_path = Path(output_dir) / Path(doc.name).stem
     Path(output_path).with_suffix(".md").write_bytes(md_cleaned.encode('utf-8'))
 
-def pdfs_to_markdowns(input_docs_dir, output_dir, overwrite: bool = False):
+def pdfs_to_markdowns(path_pattern, output_dir, overwrite: bool = False):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    for pdf_path in map(Path, glob.glob(input_docs_dir)):
+    for pdf_path in map(Path, glob.glob(path_pattern)):
         md_path = (output_dir / pdf_path.stem).with_suffix(".md")
         if overwrite or not md_path.exists():
             pdf_to_markdown(pdf_path, output_dir)
@@ -64,8 +65,13 @@ def convert_ocr_pdfs(input_docs_dir: str, markdown_dir: str):
 
     markdown_dir_path = Path(markdown_dir)
     markdown_dir_path.mkdir(parents=True, exist_ok=True)
+    input_path = Path(input_docs_dir)
 
-    pdf_files = list(Path(input_docs_dir).glob("*.pdf"))
+    if input_path.is_file() and input_path.suffix.lower() == ".pdf":
+        pdf_files = [input_path]
+       
+    if input_path.is_dir():
+        pdf_files = list(input_path.glob("*.pdf"))
 
     for file in pdf_files:
         try:

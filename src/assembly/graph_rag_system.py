@@ -2,18 +2,14 @@ import uuid
 from langchain_ollama import ChatOllama
 import config
 from vector_db.vector_db_manager import VectorDbManager
-from vector_db.parent_store_manager import ParentStoreManager
-from chunking.document_chunker import DocumentChuncker
 from graph.agents.tools import ToolFactory
 from graph.graph import create_agent_graph
 
 class RAGSystem:
     
-    def __init__(self, collection_name=config.CHILD_COLLECTION):
+    def __init__(self, vector_db: VectorDbManager, collection_name=config.CHILD_COLLECTION):
         self.collection_name = collection_name
-        self.vector_db = VectorDbManager()
-        self.parent_store = ParentStoreManager()
-        self.chunker = DocumentChuncker()
+        self.vector_db = vector_db
         self.agent_graph = None
         self.thread_id = str(uuid.uuid4())
         
