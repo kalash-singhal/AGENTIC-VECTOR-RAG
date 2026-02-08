@@ -21,9 +21,9 @@ class VectorDbManager:
                 vectors_config=qmodels.VectorParams(size=len(self.__dense_embeddings.embed_query("test")), distance=qmodels.Distance.COSINE),
                 sparse_vectors_config={config.SPARSE_VECTOR_NAME: qmodels.SparseVectorParams()},
             )
-            print(f"✓ Collection created: {collection_name}")
+            print(f"Collection created: {collection_name}")
         else:
-            print(f"✓ Collection already exists: {collection_name}")
+            print(f"Collection already exists: {collection_name}")
 
     def delete_collection(self, collection_name):
         try:

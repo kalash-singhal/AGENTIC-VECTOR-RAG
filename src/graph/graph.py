@@ -45,5 +45,5 @@ def create_agent_graph(llm, tools_list):
         interrupt_before=["human_input"]
     )
 
-    print("✓ Agent graph compiled successfully.")
+    print("Agent graph compiled successfully.")
     return agent_graph

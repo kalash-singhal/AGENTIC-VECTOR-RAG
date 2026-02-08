@@ -18,7 +18,7 @@ class GradioUI():
     def format_file_list(self):
         files = self.doc_manager.get_markdown_files()
         if not files:
-            return "📭 No documents available in the knowledge base"
+            return "No documents available in the knowledge base"
         return "\n".join([f"{f}" for f in files])
     
     def upload_handler(self, files, progress=gr.Progress()):
@@ -30,12 +30,12 @@ class GradioUI():
             progress_callback=lambda p, desc: progress(p, desc=desc)
         )
         
-        gr.Info(f"✅ Added: {added} | Skipped: {skipped}")
+        gr.Info(f"Added: {added} | Skipped: {skipped}")
         return None, self.format_file_list()
     
     def clear_handler(self):
         self.doc_manager.clear_all()
-        gr.Info(f"🗑️ Removed all documents")
+        gr.Info(f"Removed all documents")
         return self.format_file_list()
     
     def chat_handler(self, msg, hist):
