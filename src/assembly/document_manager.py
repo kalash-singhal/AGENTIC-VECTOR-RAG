@@ -10,6 +10,7 @@ class DocumentManager:
         self.parent_store = parent_store
         self.chunker = chunker
         self.vector_db = vector_db
+        self.doc_complexity = config.PDF_COMPLEXITY
         self.markdown_dir = Path(config.MARKDOWN_DIR)
         self.markdown_dir.mkdir(parents=True, exist_ok=True)
         
@@ -41,7 +42,7 @@ class DocumentManager:
                 if Path(doc_path).suffix.lower() == ".md":
                     shutil.copy(doc_path, md_path)
                 else:
-                    convert_pdf_to_markdown(str(doc_path), Path(config.MARKDOWN_DIR), overwrite=False, doc_complexity="complex")          
+                    convert_pdf_to_markdown(str(doc_path), Path(config.MARKDOWN_DIR), overwrite=False, doc_complexity=self.doc_complexity)          
                 parent_chunks, child_chunks = self.chunker.create_chunks(md_path)
                 
                 if not child_chunks:

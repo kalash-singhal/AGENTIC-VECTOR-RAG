@@ -18,9 +18,9 @@ def convert_pdf_to_markdown(input_docs_dir: str, markdown_dir: str, overwrite: b
         input_docs_dir: Path to folder containing PDF files
         markdown_dir: Path to output folder for Markdown files
         overwrite: Whether to overwrite existing Markdown files
-        doc_complexity: "simple" for PyMuPDF4LLM, "complex" for Docling with OCR and table extraction
+        doc_complexity: "simple" for PyMuPDF4LLM, "ocr" for Docling with OCR and table extraction
     """
-    if doc_complexity == "complex":
+    if doc_complexity == "ocr":
         convert_ocr_pdfs(input_docs_dir, markdown_dir)
     else:
         pdfs_to_markdowns(f"{input_docs_dir}/*.pdf", markdown_dir, overwrite)
