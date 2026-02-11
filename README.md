@@ -95,7 +95,9 @@ All agent outputs are then aggregated into a single, coherent answer.
 
 Sample pdf files can be found here: [javascript](https://www.tutorialspoint.com/javascript/javascript_tutorial.pdf), [blockchain](https://blockchain-observatory.ec.europa.eu/document/download/1063effa-59cc-4df4-aeee-d2cf94f69178_en?filename=Blockchain_For_Beginners_A_EUBOF_Guide.pdf), [microservices](https://cdn.studio.f5.com/files/k6fem79d/production/5e4126e1cefa813ab67f9c0b6d73984c27ab1502.pdf), [fortinet](https://www.commoncriteriaportal.org/files/epfiles/Fortinet%20FortiGate_EAL4_ST_V1.5.pdf(320893)_TMP.pdf)  
 
-### 1. Install Dependencies
+### Option 1: Full Python Project (Recommended for Development)
+
+#### 1. Install Dependencies
 
 **Configure LLM Provider (OLLAMA)**
 
@@ -126,10 +128,47 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Application
+#### 2. Run the Application
 
 ```bash
 python src/app.py
 ```
 
-**Enjoy chatting** via local URL (`http://127.0.0.1:7860`)
+Enjoy using via local URL (`http://127.0.0.1:7860`)
+
+
+### Option 2: Docker Deployment 
+
+> **System Requirements**: Docker deployment requires **at least 8GB of RAM** allocated to Docker. The Ollama model (`qwen3:4b-instruct-2507-q4_K_M`) needs approximately 3.3GB of memory to run.
+
+#### Prerequisites
+
+- Docker installed on your system ([Get Docker](https://docs.docker.com/get-docker/))
+- Docker Desktop configured with at least 8GB of RAM (Settings → Resources → Memory)
+
+#### 1. Build the Docker Image
+
+```bash
+docker build -f project/Dockerfile -t agentic-rag .
+```
+
+#### 2. Run the Container
+
+```bash
+docker run --name rag-assistant -p 7860:7860 agentic-rag
+```
+
+> **Performance Note**: Docker deployment may be 20-50% slower than running Python locally, especially on Windows/Mac, due to virtualization overhead and I/O operations. This is normal and expected. For maximum performance during development, consider using Option 1 (Full Python Project).
+
+#### 3. Access the Application
+
+Once the container is running and you see:
+```
+Launching RAG Assistant...
+* Running on local URL:  http://0.0.0.0:7860
+```
+
+Open your browser and enjoy using via:
+```
+http://localhost:7860
+```
