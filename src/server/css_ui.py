@@ -99,49 +99,118 @@ custom_css = """
         background: #dc2626 !important;
         transform: translateY(-1px) !important;
     }
-    
-    /* ============================================
-       CHAT INPUT BOX - MODIFIED
-       ============================================ */
-    /* Target chat input textarea - more aggressive selectors */
+
+    /* =========================================================
+   CHAT INPUT AREA
+   ========================================================= */
+
+    /* ---------- Chat input container ---------- */
+    form:has(textarea[placeholder="Type a message..."]) {
+        display: flex !important;
+        align-items: center;
+        gap: 12px !important;
+
+        padding: 18px 20px !important;
+        min-height: 72px !important;
+        border-radius: 14px !important;
+
+        background: #ffffff !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 
+            0 1px 2px rgba(0, 0, 0, 0.04),
+            0 6px 16px rgba(0, 0, 0, 0.06);
+
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Focus state for entire input container */
+    form:has(textarea[placeholder="Type a message..."]:focus-within) {
+        border-color: rgba(59, 130, 246, 0.6) !important;
+        box-shadow: 
+            0 0 0 2px rgba(59, 130, 246, 0.15),
+            0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ---------- Textarea styling ---------- */
     textarea[placeholder="Type a message..."],
     textarea[data-testid*="textbox"]:not(#file-list-box textarea) {
-        background: transparent !important;
+        flex: 1;
+        resize: none !important;
+
+        background: #ffffff !important;
         border: none !important;
+        outline: none !important;
         box-shadow: none !important;
+
+        padding: 12px 6px !important;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #0f172a !important; /* black / slate-900 */
+
+        min-height: 48px;
     }
-    
-    textarea[placeholder="Type a message..."]:focus {
-        background: transparent !important;
+
+    /* Placeholder */
+    textarea::placeholder {
+        color: #64748b !important; /* slate-500 */
+        opacity: 1 !important;
+    }
+
+    /* ---------- Send / submit button ---------- */
+    form:has(textarea[placeholder="Type a message..."]) button[type="submit"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 40px;
+        height: 40px;
+
+        border-radius: 10px;
         border: none !important;
-        box-shadow: none !important;
+
+        background: #3b82f6;
+        color: white;
+
+        cursor: pointer;
+        transition: 
+            background-color 0.2s ease,
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
     }
-    
-    /* Target the wrapper/container of chat input */
-    .gr-text-input:has(textarea[placeholder="Type a message..."]),
-    [class*="chatbot"] + * [data-testid="textbox"],
-    form:has(textarea[placeholder="Type a message..."]) > div {
-        background: transparent !important;
-        border: none !important;
-        gap: 12px !important;
+
+    /* Hover */
+    form:has(textarea[placeholder="Type a message..."]) button[type="submit"]:hover {
+        background: #2563eb; /* blue-600 */
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.35);
+        transform: translateY(-1px);
     }
-    
-    /* Remove background from submit button in chat */
-    form:has(textarea[placeholder="Type a message..."]) button,
-    [class*="chatbot"] ~ * button[type="submit"] {
-        background: transparent !important;
-        border: none !important;
-        padding: 8px !important;
+
+    /* Active / click */
+    form:has(textarea[placeholder="Type a message..."]) button[type="submit"]:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
     }
-    
-    form:has(textarea[placeholder="Type a message..."]) button:hover {
-        background: rgba(59, 130, 246, 0.1) !important;
+
+    /* Disabled state */
+    form:has(textarea[placeholder="Type a message..."]) button[type="submit"]:disabled {
+        background: #cbd5f5; /* muted blue */
+        cursor: not-allowed;
+        box-shadow: none;
     }
-    
-    /* Add spacing to the form container */
-    form:has(textarea[placeholder="Type a message..."]) {
-        gap: 12px !important;
-        display: flex !important;
+
+    /* ---------- Mobile friendliness ---------- */
+    @media (max-width: 640px) {
+        form:has(textarea[placeholder="Type a message..."]) {
+            padding: 8px 10px !important;
+            border-radius: 12px !important;
+        }
+
+        textarea {
+            font-size: 15px;
+        }
     }
     
     /* ============================================
@@ -220,24 +289,122 @@ custom_css = """
        ============================================ */
     .chatbot {
         border-radius: 5px !important;
-        background: #1a1a1a !important;
+        background: #ffffff !important;
         border: none !important;
+        color: #000000 !important;
+        padding: 24px !important;
+
+        height: auto !important;
+        min-height: unset !important;
+        width: 100% !important;
+
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box !important;
+        font-size: 1.05rem;
+        overflow: visible !important;
+    }
+    .chatbot p,
+    .chatbot span {
+        color: #000000 !important;
+        font-weight: 600 !important;
+        display: block !important;
+        margin: 0 !important;
+        text-align: left !important;
+    }
+
+    .chatbot .messages,
+    .chatbot .wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 12px;
+
+        overflow: visible !important;
     }
     
     .message {
-        border-radius: 10px !important;
-        width: fit-content !important;
+        border-radius: 12px !important;
+        width: auto !important;
+        padding: 10px 12px !important;
+        background: #f3f4f6 !important;
+        color: #000000 !important;
+        border: none !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+        max-width: 75% !important;
+        margin-bottom: 12px !important;
+
+        word-break: normal !important;
+        overflow-wrap: anywhere !important;
+        white-space: normal !important;
     }
     
     .message.user {
-        background: #3b82f6 !important;
-        color: white !important;
+        background: #f3f4f6 !important;
+        color: #000000 !important;
     }
     
     .message.bot {
-        background: #1f1f1f !important;
-        color: #e5e5e5 !important;
+        background: #f3f4f6 !important;
+        color: #000000 !important;
         border: 1px solid #3f3f3f !important;
+    }
+
+    .message p,
+    .message ul,
+    .message ol,
+    .message li {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* ============================================
+    REMOVE INNER WHITE MESSAGE CONTAINER
+    ============================================ */
+    .message > div,
+    .message .markdown,
+    .message .prose,
+    .message .content {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* ============================================
+    ALIGN MESSAGE CONTENT PERFECTLY
+    ============================================ */
+    .message > *,
+    .message .markdown,
+    .message .prose {
+        width: 100% !important;
+        box-sizing: border-box !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        background: transparent !important;
+    }
+
+    /* ============================================
+    INITIAL EMPTY STATE (Ask me anything)
+    ============================================ */
+    .chatbot:not(:has(.message)) {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    .chatbot:not(:has(.message)) p,
+    .chatbot:not(:has(.message)) span {
+        margin: 0 !important;
+        text-align: center !important;
+        font-weight: 600 !important;
+        color: #000000 !important;
     }
     
     /* ============================================

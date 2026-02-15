@@ -6,7 +6,7 @@
 
 ## Overview
 
-This repository showcases a practical implementation of an **Agentic RAG (Retrieval-Augmented Generation)** system built with LangGraph, designed to stay lightweight while demonstrating powerful agent-driven behaviors. The system goes beyond basic RAG by introducing reasoning, coordination, and self-improvement mechanisms. Currently, the system supports PDF documents only as input for conversational interactions. It uses Qdrant as the vector storage for efficient similarity search. It implements:
+This project showcases a practical implementation of an **Agentic RAG (Retrieval-Augmented Generation)** system built with LangGraph, designed to stay lightweight while demonstrating powerful agent-driven behaviors. The system goes beyond basic RAG by introducing reasoning, coordination, and self-improvement mechanisms. Currently, the system supports PDF documents only as input for conversational interactions. It uses Qdrant as the vector storage for efficient similarity search. It implements:
 
 - **Multi-Agent Map-Reduce**: Breaks complex user questions into smaller sub-queries that can be processed in parallel by multiple agents, then aggregates the results to produce more complete and well-reasoned final answers.
 - **Agent Orchestration**: Leverages LangGraph to coordinate multiple agent steps—such as retrieval, evaluation, and refinement—into a structured, traceable workflow instead of a linear pipeline.
@@ -37,7 +37,26 @@ Although plain text extraction is fast and JSON provides explicit structure, Mar
 - **Balances human and machine readability**: Unlike JSON’s verbose, schema-driven format or plain text’s lack of structure, Markdown is intuitive for both humans and language models.
 - **Enables effective chunking**: Clear structural markers (headers, paragraphs) make it easier to split documents into meaningful chunks for retrieval.
 
-By comparison, plain text strips away all formatting and hierarchy, making it difficult for retrieval systems to distinguish titles, metadata, and body content. JSON can encode structure, but it is often verbose, schema-dependent, and inefficient for large, text-heavy documents. Markdown naturally bridges this gap. That's why, this repository uses Markdown for RAG.
+By comparison, plain text strips away all formatting and hierarchy, making it difficult for retrieval systems to distinguish titles, metadata, and body content. JSON can encode structure, but it is often verbose, schema-dependent, and inefficient for large, text-heavy documents. Markdown naturally bridges this gap. That's why, this project uses Markdown for RAG.
+
+## PDF Complexity Classification
+
+The quality of RAG system is fundamentally constrained by the quality of the extracted data. Poorly extracted, scanned or "dirty" data—text with broken formatting, missing tables, garbled formulas, or lost context—leads directly to inaccurate retrieval and hallucinated responses. Therefore, this project can extract two types of PDFs as categorized below:
+
+**Simple PDFs**
+- Text-only documents with standard layouts
+- Digital PDFs with selectable text
+- Examples: Reports, articles, plain books, documentation
+- **Note:** If scanned, move to Category 2 (OCR required)
+
+**Scanned PDFs (OCR)**
+- Documents with tables and basic formatting
+- Scanned documents (even if simple layout)
+- PDFs with occasional images
+- Multi-column layouts
+- Examples: Academic papers, business reports, scanned books
+
+This project has the ability to extract the scanned documents using Optical Character Recognition (OCR) technique. The variable `PDF_COMPLEXITY` in `config.py` file can be used to shift from "simple" to "ocr" mode for extracting scanned documents.
 
 ## How It Works
 
@@ -172,3 +191,11 @@ Open your browser and enjoy using via:
 ```
 http://localhost:7860
 ```
+
+## Customization Options
+
+#### **Configuration (`config.py`)**
+- **OLLAMA Models**: Switch between different Ollama models (via `LLM_MODEL`) and change its temperature (via `LLM_TEMPERATURE`)
+- **Embedding Model**: Configure embedding model for vector representations (via `DENSE_MODEL` and `SPARSE_MODEL`)
+- **Chunk Sizes**: Adjust child and parent chunk dimensions for optimal retrieval (via `CHILD_CHUNK_SIZE`, `CHILD_CHUNK_OVERLAP`, `MIN_PARENT_SIZE`, and `MAX_PARENT_SIZE`)
+- **PDF complexity**: PDF extraction capability can interchanged between two PDF types i.e. "simple" and "ocr" (via `PDF_COMPLEXITY`). Please read more about the OCR in "PDF Complexity Classification" section above.

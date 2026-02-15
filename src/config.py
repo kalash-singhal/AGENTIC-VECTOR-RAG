@@ -24,3 +24,6 @@ HEADERS_TO_SPLIT_ON = [
     ("##", "H2"),
     ("###", "H3")
 ]
+
+# --- PDF complexity Configuration ---
+PDF_COMPLEXITY = "simple"  # options: "simple", "ocr"
