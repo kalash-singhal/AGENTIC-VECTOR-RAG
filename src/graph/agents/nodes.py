@@ -3,7 +3,7 @@ from graph.graph_state import State, AgentState
 from graph.agents.query_schema import QueryAnalysis
 from graph.agents.prompts import *
 
-def analyze_chat_and_summarize(state: State, llm):
+async def summarize_chat_agent(state: State, llm):
     if len(state["messages"]) < 4:
         return {"conversation_summary": ""}
     
@@ -21,17 +21,17 @@ def analyze_chat_and_summarize(state: State, llm):
         role = "User" if isinstance(msg, HumanMessage) else "Assistant"
         conversation += f"{role}: {msg.content}\n"
 
-    summary_response = llm.with_config(temperature=0.2).invoke([SystemMessage(content=CONVERSATION_SUMMARY_PROMPT)] + [HumanMessage(content=conversation)])
+    summary_response = await llm.with_config(temperature=0.2).ainvoke([SystemMessage(content=CONVERSATION_SUMMARY_PROMPT)] + [HumanMessage(content=conversation)])
     return {"conversation_summary": summary_response.content, "agent_answers": [{"__reset__": True}]}
 
-def analyze_and_rewrite_query(state: State, llm):
+async def rewrite_query_agent(state: State, llm):
     last_message = state["messages"][-1]
     conversation_summary = state.get("conversation_summary", "")
 
     context_section = (f"Conversation Context:\n{conversation_summary}\n" if conversation_summary.strip() else "") + f"User Query:\n{last_message.content}\n"
 
     llm_with_structure = llm.with_config(temperature=0.1).with_structured_output(QueryAnalysis)
-    response = llm_with_structure.invoke([SystemMessage(content=QUERY_ANALYSIS_PROMPT)] + [HumanMessage(content=context_section)])
+    response = await llm_with_structure.ainvoke([SystemMessage(content=QUERY_ANALYSIS_PROMPT)] + [HumanMessage(content=context_section)])
 
     if len(response.questions) > 0 and response.is_clear:
         delete_all = [
@@ -55,14 +55,14 @@ def analyze_and_rewrite_query(state: State, llm):
 def human_input_node(state: State):
     return {}
 
-def agent_node(state: AgentState, llm_with_tools):
+async def rag_agent(state: AgentState, llm_with_tools):
     sys_msg = SystemMessage(content=RAG_AGENT_PROMPT)    
     if not state.get("messages"):
         human_msg = HumanMessage(content=state["question"])
-        response = llm_with_tools.invoke([sys_msg] + [human_msg])
+        response = await llm_with_tools.ainvoke([sys_msg] + [human_msg])
         return {"messages": [human_msg, response]}
     
-    return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
+    return {"messages": [await llm_with_tools.ainvoke([sys_msg] + state["messages"])]}
 
 def extract_final_answer(state: AgentState):
     for msg in reversed(state["messages"]):
@@ -85,7 +85,7 @@ def extract_final_answer(state: AgentState):
         }]
     }
 
-def aggregate_responses(state: State, llm):
+async def aggregate_answers_agent(state: State, llm):
     if not state.get("agent_answers"):
         return {"messages": [AIMessage(content="No answers were generated.")]}
 
@@ -96,6 +96,6 @@ def aggregate_responses(state: State, llm):
         formatted_answers += (f"\nAnswer {i}:\n"f"{ans['answer']}\n")
 
     user_message = HumanMessage(content=f"""Original user question: {state["originalQuery"]}\nRetrieved answers:{formatted_answers}""")
-    synthesis_response = llm.invoke([SystemMessage(content=AGGREGATION_PROMPT)] + [user_message])
+    synthesis_response = await llm.ainvoke([SystemMessage(content=AGGREGATION_PROMPT)] + [user_message])
     
     return {"messages": [AIMessage(content=synthesis_response.content)]}

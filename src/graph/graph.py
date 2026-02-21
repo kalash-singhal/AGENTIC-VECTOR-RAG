@@ -15,7 +15,7 @@ def create_agent_graph(llm, tools_list):
 
     print("Compiling agent graph...")
     agent_builder = StateGraph(AgentState)
-    agent_builder.add_node("agent", partial(agent_node, llm_with_tools=llm_with_tools))
+    agent_builder.add_node("agent", partial(rag_agent, llm_with_tools=llm_with_tools))
     agent_builder.add_node("tools", tool_node)
     agent_builder.add_node("extract_answer", extract_final_answer)
     
@@ -27,11 +27,11 @@ def create_agent_graph(llm, tools_list):
     agent_subgraph = agent_builder.compile()
     
     graph_builder = StateGraph(State)
-    graph_builder.add_node("summarize", partial(analyze_chat_and_summarize, llm=llm))
-    graph_builder.add_node("analyze_rewrite", partial(analyze_and_rewrite_query, llm=llm))
+    graph_builder.add_node("summarize", partial(summarize_chat_agent, llm=llm))
+    graph_builder.add_node("analyze_rewrite", partial(rewrite_query_agent, llm=llm))
     graph_builder.add_node("human_input", human_input_node)
     graph_builder.add_node("process_question", agent_subgraph)
-    graph_builder.add_node("aggregate", partial(aggregate_responses, llm=llm))
+    graph_builder.add_node("aggregate", partial(aggregate_answers_agent, llm=llm))
     
     graph_builder.add_edge(START, "summarize")
     graph_builder.add_edge("summarize", "analyze_rewrite")
