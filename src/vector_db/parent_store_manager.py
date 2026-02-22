@@ -4,6 +4,7 @@ import shutil
 import config
 from pathlib import Path
 from typing import List, Dict
+import asyncio
 
 class ParentStoreManager:
     __store_path: Path
@@ -29,8 +30,8 @@ class ParentStoreManager:
         )
         return json.loads(file_path.read_text(encoding="utf-8"))
     
-    def load_content(self, parent_id: str) -> Dict:
-        data = self.load(parent_id)
+    async def load_content(self, parent_id: str) -> Dict:
+        data = await asyncio.to_thread(self.load, parent_id)
         return {
                 "content": data["page_content"],
                 "parent_id": parent_id,

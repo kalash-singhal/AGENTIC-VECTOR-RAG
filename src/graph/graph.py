@@ -1,27 +1,21 @@
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.prebuilt import ToolNode, tools_condition
 from functools import partial
 
 from graph.graph_state import State
 from graph.agents.nodes import *
 from graph.edges import *
 
-def create_agent_graph(llm, tools_list):
-    llm_with_tools = llm.bind_tools(tools_list)
-    tool_node = ToolNode(tools_list)
-
+def create_agent_graph(llm, collection):
     checkpointer = InMemorySaver()
 
     print("Compiling agent graph...")
     agent_builder = StateGraph(AgentState)
-    agent_builder.add_node("agent", partial(rag_agent, llm_with_tools=llm_with_tools))
-    agent_builder.add_node("tools", tool_node)
+    agent_builder.add_node("agent", partial(rag_agent, llm=llm, collection=collection))
     agent_builder.add_node("extract_answer", extract_final_answer)
     
-    agent_builder.add_edge(START, "agent")    
-    agent_builder.add_conditional_edges("agent", tools_condition, {"tools": "tools", END: "extract_answer"})
-    agent_builder.add_edge("tools", "agent")    
+    agent_builder.add_edge(START, "agent")
+    agent_builder.add_edge("agent", "extract_answer")
     agent_builder.add_edge("extract_answer", END)
     
     agent_subgraph = agent_builder.compile()

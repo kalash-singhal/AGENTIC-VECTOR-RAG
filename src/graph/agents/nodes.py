@@ -2,6 +2,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, RemoveMessage, 
 from graph.graph_state import State, AgentState
 from graph.agents.query_schema import QueryAnalysis
 from graph.agents.prompts import *
+from graph.agents.retriever import DeterministicRetriever
 
 async def summarize_chat_agent(state: State, llm):
     if len(state["messages"]) < 4:
@@ -55,14 +56,20 @@ async def rewrite_query_agent(state: State, llm):
 def human_input_node(state: State):
     return {}
 
-async def rag_agent(state: AgentState, llm_with_tools):
-    sys_msg = SystemMessage(content=RAG_AGENT_PROMPT)    
+async def rag_agent(state: AgentState, llm, collection):
+    retriever = DeterministicRetriever(collection)
+    retrieval_result = await retriever.deterministic_retrieval_workflow(query=state["question"], limit=5)
+    context = retriever.format_retrieval_context(retrieval_result)
+    sys_msg = SystemMessage(content=f"""{RAG_AGENT_PROMPT}
+                            Use ONLY the following retrieved context to answer:
+                            {context}""")
+   
     if not state.get("messages"):
         human_msg = HumanMessage(content=state["question"])
-        response = await llm_with_tools.ainvoke([sys_msg] + [human_msg])
+        response = await llm.ainvoke([sys_msg] + [human_msg])
         return {"messages": [human_msg, response]}
     
-    return {"messages": [await llm_with_tools.ainvoke([sys_msg] + state["messages"])]}
+    return {"messages": [await llm.ainvoke([sys_msg] + state["messages"])]}
 
 def extract_final_answer(state: AgentState):
     for msg in reversed(state["messages"]):
