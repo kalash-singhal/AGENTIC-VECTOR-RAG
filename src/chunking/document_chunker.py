@@ -133,4 +133,4 @@ class DocumentChuncker:
             all_parent_pairs.append((parent_id, p_chunk))
             all_child_chunks.extend(self.__child_splitter.split_documents([p_chunk]))
 
-            return all_parent_pairs, all_child_chunks
+        return all_parent_pairs, all_child_chunks

@@ -2,7 +2,6 @@ import uuid
 from langchain_ollama import ChatOllama
 import config
 from vector_db.vector_db_manager import VectorDbManager
-from graph.agents.tools import ToolFactory
 from graph.graph import create_agent_graph
 
 class RAGSystem:
@@ -18,8 +17,7 @@ class RAGSystem:
         collection = self.vector_db.get_collection(self.collection_name)
         
         llm = ChatOllama(model=config.LLM_MODEL, temperature=config.LLM_TEMPERATURE)
-        tools = ToolFactory(collection).create_tools()
-        self.agent_graph = create_agent_graph(llm, tools)
+        self.agent_graph = create_agent_graph(llm, collection)
         
     def get_config(self):
         return {"configurable": {"thread_id": self.thread_id}}

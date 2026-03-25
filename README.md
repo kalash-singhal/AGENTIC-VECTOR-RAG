@@ -12,11 +12,13 @@ This project showcases a practical implementation of an **Agentic RAG (Retrieval
 - **Agent Orchestration**: Leverages LangGraph to coordinate multiple agent steps—such as retrieval, evaluation, and refinement—into a structured, traceable workflow instead of a linear pipeline.
 - **Intelligent Evaluation**: Evaluates the relevance and usefulness of retrieved information at the individual chunk level, ensuring that only high-quality context is passed to the generation step.
 - **Hierarchical Indexing**: Combines fine-grained and coarse-grained retrieval by searching over small, focused child chunks for precision, then expanding to larger parent chunks to provide richer contextual grounding for generation.
+- **Asynchronous Ingestion**: Ingest data asynchronously to speed up the process. It allows mutiple ingestion tasks to run parallelly and independently.
 - **Hybrid Search**: Integrates dense semantic embeddings with sparse BM25 scoring to balance semantic relevance and keyword matching.
 - **Conversation Memory**: Preserves dialogue history across multiple user interactions, allowing the system to maintain context and respond coherently in ongoing conversations rather than treating each query in isolation.
 - **Query Clarification**: Detects vague or underspecified user queries and either reformulates them into clearer search queries or explicitly asks the user for clarification, improving retrieval accuracy from the start.
 - **Self-Correction**: Monitors the adequacy of retrieved results and automatically triggers follow-up searches or alternative strategies when the initial retrieval does not meet quality thresholds.
 - **Modular architecture**: Designed with interchangeable components, allowing you to easily replace or extend individual parts of the system (such as the LLM, retriever, or evaluator) without impacting the overall workflow.
+- **Deterministic Retrieval**: Deterministic Retrieval over tool-based retrieval for faster RAG.
 - **Simple web UI**: Includes a complete, end-to-end Gradio application that supports document upload, indexing, and querying, making it easy to interact with and manage the system.
 
 This approach balances the accuracy of fine-grained retrieval with the broader context of larger document sections, while maintaining awareness of conversational history, clarifying ambiguous queries, and answering complex, multi-part questions through parallel agent execution. Its modular design allows each component—from document ingestion to retrieval and reasoning—to be independently customized or replaced without disrupting the overall system.

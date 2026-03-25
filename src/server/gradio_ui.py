@@ -38,8 +38,8 @@ class GradioUI():
         gr.Info(f"Removed all documents")
         return self.format_file_list()
     
-    def chat_handler(self, msg, hist):
-        return self.chat_interface.chat(msg, hist)
+    async def chat_handler(self, msg, hist):
+        return await self.chat_interface.chat(msg, hist)
     
     def clear_chat_handler(self):
         self.chat_interface.clear_session()

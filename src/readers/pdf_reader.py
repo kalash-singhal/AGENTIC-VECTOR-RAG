@@ -1,6 +1,5 @@
 import os
-import config
-import pymupdf
+import pymupdf  #import layout
 import pymupdf4llm
 import glob
 from pathlib import Path
@@ -21,29 +20,29 @@ def convert_pdf_to_markdown(input_docs_dir: str, markdown_dir: str, overwrite: b
         doc_complexity: "simple" for PyMuPDF4LLM, "ocr" for Docling with OCR and table extraction
     """
     if doc_complexity == "ocr":
-        convert_ocr_pdfs(input_docs_dir, markdown_dir)
+        ocr_pdfs_to_markdown(input_docs_dir, markdown_dir)
     else:
-        pdfs_to_markdowns(f"{input_docs_dir}/*.pdf", markdown_dir, overwrite)
+        simple_pdfs_to_markdowns(f"{input_docs_dir}/*.pdf", markdown_dir, overwrite)
     
 
-def pdf_to_markdown(pdf_path, output_dir):
-    doc = pymupdf.open(pdf_path)
-    md = pymupdf4llm.to_markdown(doc, header=False, footer=False, page_separators=True, ignore_images=True, write_images=False, image_path=None)
-    md_cleaned = md.encode('utf-8', errors='surrogatepass').decode('utf-8', errors='ignore')
-    output_path = Path(output_dir) / Path(doc.name).stem
-    Path(output_path).with_suffix(".md").write_bytes(md_cleaned.encode('utf-8'))
+def simple_pdf_to_markdown(pdf_file_path, markdown_dir):
+    pdf_file = pymupdf.open(pdf_file_path)
+    markdown_file = pymupdf4llm.to_markdown(pdf_file, header=False, footer=False, page_separators=True, ignore_images=True, write_images=False, image_path=None)
+    markdown_file_cleaned = markdown_file.encode('utf-8', errors='surrogatepass').decode('utf-8', errors='ignore')
+    markdown_file_path = Path(markdown_dir) / Path(pdf_file.name).stem
+    Path(markdown_file_path).with_suffix(".md").write_bytes(markdown_file_cleaned.encode('utf-8'))
 
-def pdfs_to_markdowns(path_pattern, output_dir, overwrite: bool = False):
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+def simple_pdfs_to_markdowns(pdf_path_pattern, markdown_dir, overwrite: bool = False):
+    markdown_dir_path = Path(markdown_dir)
+    markdown_dir_path.mkdir(parents=True, exist_ok=True)
 
-    for pdf_path in map(Path, glob.glob(path_pattern)):
-        md_path = (output_dir / pdf_path.stem).with_suffix(".md")
-        if overwrite or not md_path.exists():
-            pdf_to_markdown(pdf_path, output_dir)
+    for pdf_path in map(Path, glob.glob(pdf_path_pattern)):
+        markdown_path = (markdown_dir_path / pdf_path.stem).with_suffix(".md")
+        if overwrite or not markdown_path.exists():
+            simple_pdf_to_markdown(pdf_path, markdown_dir_path)
 
 
-def convert_ocr_pdfs(input_docs_dir: str, markdown_dir: str):
+def ocr_pdfs_to_markdown(input_docs_dir: str, markdown_dir: str):
     """
     Convert medium-complexity PDFs using Docling with OCR and table extraction.
 
